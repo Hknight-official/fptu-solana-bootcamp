@@ -33,6 +33,7 @@ const payer = loadKeypairFromFile(
 Write code (preferably in JavaScript) to mint a fungible token (token).
 The tokens should have names, symbols, descriptions, and images.
 The token decimals should be set to 6.
+The code should mint 100 tokens for yourself.
 All the above steps must be completed in a single transaction.
  */
 (async () => {
