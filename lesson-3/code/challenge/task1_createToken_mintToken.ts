@@ -1,5 +1,10 @@
 import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
-import { MINT_SIZE, TOKEN_PROGRAM_ID, createInitializeMint2Instruction } from "@solana/spl-token";
+import {
+    MINT_SIZE,
+    TOKEN_PROGRAM_ID,
+    createInitializeMint2Instruction,
+    ASSOCIATED_TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createMintToInstruction
+} from "@solana/spl-token";
 
 import {
     PROGRAM_ID as METADATA_PROGRAM_ID,
@@ -28,6 +33,7 @@ const payer = loadKeypairFromFile(
 Write code (preferably in JavaScript) to mint a fungible token (token).
 The tokens should have names, symbols, descriptions, and images.
 The token decimals should be set to 6.
+All the above steps must be completed in a single transaction.
  */
 (async () => {
     console.log("Payer address:", payer.publicKey.toBase58());
@@ -98,6 +104,33 @@ The token decimals should be set to 6.
         },
     );
 
+    const tokenAccount = await PublicKey.findProgramAddress(
+        [
+            payer.publicKey.toBuffer(),
+            TOKEN_PROGRAM_ID.toBuffer(),
+            mintKeypair.publicKey.toBuffer(),
+        ],
+        ASSOCIATED_TOKEN_PROGRAM_ID
+    );
+
+    const createTokenAccountInstruction = createAssociatedTokenAccountInstruction(
+        payer.publicKey,
+        tokenAccount[0],
+        payer.publicKey,
+        mintKeypair.publicKey,
+        TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID
+    );
+
+    console.log("Token ATA account address:", tokenAccount[0].toBase58());
+
+    const mintTokensInstruction = createMintToInstruction(
+        mintKeypair.publicKey,
+        tokenAccount[0],
+        payer.publicKey,
+        100 * 10**6,
+    );
+
     const tx = await buildTransaction({
         connection,
         payer: payer.publicKey,
@@ -106,19 +139,15 @@ The token decimals should be set to 6.
             createMintAccountInstruction,
             initializeMintInstruction,
             createMetadataInstruction,
+            createTokenAccountInstruction,
+            mintTokensInstruction
         ],
     });
 
     try {
-        // actually send the transaction
         const sig = await connection.sendTransaction(tx);
-
-        // print the explorer url
         console.log("Transaction completed.");
         console.log(explorerURL({ txSignature: sig }));
-
-        // locally save our addresses for the demo
-        savePublicKeyToFile("tokenMint", mintKeypair.publicKey);
     } catch (err) {
         console.error("Failed to send transaction:");
         console.log(tx);
@@ -126,16 +155,15 @@ The token decimals should be set to 6.
         // attempt to extract the signature from the failed transaction
         const failedSig = await extractSignatureFromFailedTransaction(connection, err);
         if (failedSig) console.log("Failed signature:", explorerURL({ txSignature: failedSig }));
-
         throw err;
     }
 
 })();
 /* output
 Payer address: 8gKKm1P7bEdqAuohewyYrontfJnfwoXrwtQmsfoxJEWg
-Test wallet address: BqE6Bap3r1q5cNNvbfjzNZKAHU6wQijhzCmFo2LDTXxt
-Mint address: uYDYRA3sKXhrdjDHc4fWFsgot36Q13VTtZH3R3xCXP1
-Metadata address: 9aG73GPZFbeh1VNjP43kcBj1EmyGfvVe4hAmYyEvRN3o
+Mint address: GEdMHxVoLJUh1QP8jxFJky3dsfdLbBVu67qAUd3NY1oC
+Metadata address: 5SXbau88vD2GZ9qs2FhHv1KqJ6nBqRrjFg4o9KCy1Wbg
+Token ATA account address: 6EisfDsBwihZhe1D4Ro2RGn7WfYVKZKtnCp1pr53Sz8A
 Transaction completed.
-https://explorer.solana.com/tx/4ja6PJ21n1k88EUeVLrvfPoVPvgjMQMq4EcQLE3rEbpcpgYCb1V4Updkirfpekcj1z6QuKxkKVvtVP5qa28eJkT2?cluster=devnet
+https://explorer.solana.com/tx/4Z4ux4x2od45e5JMmRDgzdfV3ErUmDErzKga7ZaPaGeik5mPUSWsiLjnBVmyf1YmksCzx8GPhgzNiYPVq7EFeLr2?cluster=devnet
  */
