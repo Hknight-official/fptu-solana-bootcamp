@@ -17,5 +17,5 @@ dotenv.config();
   // Load a keypair from a file
   const localKp = loadKeypairFromFile(process.env.LOCAL_PAYER_JSON_ABSPATH as string);
   console.log(`The public key is: `, localKp.publicKey.toBase58());
-  
+
 })();
