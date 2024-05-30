@@ -16,9 +16,9 @@ const payer = loadKeypairFromFile(
 );
 
 /*
-Write code (preferably in JavaScript) to mint a fungible token (token).
-The tokens should have names, symbols, descriptions, and images.
-The token decimals should be set to 6.
+Write code (preferably in JavaScript) to mint a non-fungible token (NFT).
+The NFT should also have a name, symbol, description, image, and additional traits.
+The NFT royalty should be set to 10%.
  */
 (async () => {
     console.log("Payer address:", payer.publicKey.toBase58());
