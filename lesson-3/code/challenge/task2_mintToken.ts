@@ -9,14 +9,16 @@ dotenv.config();
 const payer = loadKeypairFromFile(
     process.env.LOCAL_PAYER_JSON_ABSPATH as string
 );
-
+/*
+The code should mint 100 tokens for yourself.
+ */
 (async () => {
     console.log("Payer address:", payer.publicKey.toBase58());
 
     const localKeys = loadPublicKeysFromFile();
 
     if (!localKeys?.tokenMint)
-        return console.warn("No local keys were found. Please run 'task1_create_token.ts'");
+        return console.warn("No local keys were found. Please run 'task1_createToken.ts'");
 
     const tokenMint: PublicKey = localKeys.tokenMint;
 
@@ -46,3 +48,13 @@ const payer = loadKeypairFromFile(
     console.log(explorerURL({ txSignature: mintSig }));
 
 })();
+/* output
+Payer address: 8gKKm1P7bEdqAuohewyYrontfJnfwoXrwtQmsfoxJEWg
+==== Local PublicKeys loaded ====
+Token's mint address: uYDYRA3sKXhrdjDHc4fWFsgot36Q13VTtZH3R3xCXP1
+https://explorer.solana.com/address/uYDYRA3sKXhrdjDHc4fWFsgot36Q13VTtZH3R3xCXP1?cluster=devnet
+
+Token ata account address: 917fAwWqFqn86ro78xFdrcRZeUjHZ6MTvfnNfU6Hqa9V
+Minting some tokens to the ata...
+https://explorer.solana.com/tx/5FSnX5G8jjjwT5epTgnNZdnTNJfFqnQ3SBtQK67N3u26emYbTVe3RTLwrbG945UFvPaXDhiNaMUvYTWgkbzNjPQu?cluster=devnet
+ */

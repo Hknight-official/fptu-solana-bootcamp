@@ -7,7 +7,7 @@ import {
 } from "@metaplex-foundation/mpl-token-metadata";
 
 import {loadKeypairFromFile } from "@/lib/helpers";
-import {testWallet, connection } from "@/lib/vars";
+import { connection } from "@/lib/vars";
 
 import {
     buildTransaction,
@@ -25,13 +25,12 @@ const payer = loadKeypairFromFile(
 );
 
 /*
-Write code (preferably in JavaScript) to mint both a fungible token (token) and a non-fungible token (NFT).
+Write code (preferably in JavaScript) to mint a fungible token (token).
 The tokens should have names, symbols, descriptions, and images.
 The token decimals should be set to 6.
  */
 (async () => {
     console.log("Payer address:", payer.publicKey.toBase58());
-    console.log("Test wallet address:", testWallet.publicKey.toBase58());
 
     const mintKeypair = Keypair.generate();
     console.log("Mint address:", mintKeypair.publicKey.toBase58());
@@ -110,8 +109,6 @@ The token decimals should be set to 6.
         ],
     });
 
-    printConsoleSeparator();
-
     try {
         // actually send the transaction
         const sig = await connection.sendTransaction(tx);
@@ -134,3 +131,11 @@ The token decimals should be set to 6.
     }
 
 })();
+/* output
+Payer address: 8gKKm1P7bEdqAuohewyYrontfJnfwoXrwtQmsfoxJEWg
+Test wallet address: BqE6Bap3r1q5cNNvbfjzNZKAHU6wQijhzCmFo2LDTXxt
+Mint address: uYDYRA3sKXhrdjDHc4fWFsgot36Q13VTtZH3R3xCXP1
+Metadata address: 9aG73GPZFbeh1VNjP43kcBj1EmyGfvVe4hAmYyEvRN3o
+Transaction completed.
+https://explorer.solana.com/tx/4ja6PJ21n1k88EUeVLrvfPoVPvgjMQMq4EcQLE3rEbpcpgYCb1V4Updkirfpekcj1z6QuKxkKVvtVP5qa28eJkT2?cluster=devnet
+ */
